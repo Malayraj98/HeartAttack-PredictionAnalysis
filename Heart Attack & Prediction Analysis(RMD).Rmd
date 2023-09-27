@@ -1,0 +1,520 @@
+---
+title: "HeartAttack&Prediction Analysis"
+author: "Malay Raj"
+date: "2023-09-26"
+output:
+  word_document: default
+  html_document: default
+---
+
+## HEART ATTACK & PREDICTION ANALYSIS:
+
+This dataset contains information about people's health, including details such as age, sex, chest pain, etc.
+
+## Loading Required Packages.
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(dplyr)
+library(ggplot2)
+library(skimr)
+library(plyr)
+library(lubridate)
+library(plotly)
+library(gridExtra)
+```
+
+## Displaying my current working directory.
+
+```{r}
+getwd()
+```
+
+## Collecting the data.
+
+```{r}
+heart = read.csv("C:/Heart Attack & Prediction Analysis/heart.csv")
+```
+
+## Displaying the first six rows of dataset.
+
+```{r}
+head(heart)
+```
+
+## Checking the dimension of the dataset.
+
+```{r}
+dim(heart)
+```
+
+## Displaying the column names of our dataframe.
+
+```{r}
+colnames(heart)
+```
+
+## Inspecting the dataframe and look for inconguencies.
+
+```{r}
+str(heart)
+```
+
+## Chaning few names of few columns in our dataset.
+
+```{r}
+heart = plyr::rename(heart, replace=c("cp" = "chest_pain",
+                                      "fbs" = "fasting_blood_sugar",
+                                      "exng" = "exercise_induced_angina",
+                                      "slp" = "slope",
+                                      "thall" = "thalassemia",
+                                      "output" = "target"))
+```
+
+## Checking the column names of our new columns.
+
+```{r}
+colnames(heart)
+```
+
+## Checking for null values in our dataset.
+
+```{r}
+null_sum <- colSums(is.na(heart))
+null_sum
+```
+
+## Checking for any duplicate values in our dataset.
+
+```{r}
+anyDuplicated(heart)
+```
+
+## Removing those duplicate values.
+
+```{r}
+heart = unique(heart)
+anyDuplicated(heart)
+```
+
+## Checking for the current dimensions of our dataset.
+
+```{r}
+dim(heart)
+```
+
+## Seeing how many observations fall under each of these columns.
+
+```{r}
+table(heart$age)
+```
+
+```{r}
+table(heart$sex)
+```
+
+```{r}
+table(heart$chest_pain)
+```
+
+```{r}
+table(heart$trtbps)
+```
+
+```{r}
+table(heart$chol)
+```
+
+```{r}
+table(heart$fasting_blood_sugar)
+```
+
+```{r}
+table(heart$restecg)
+```
+
+```{r}
+table(heart$thalachh)
+```
+
+```{r}
+table(heart$exercise_induced_angina)
+```
+
+```{r}
+table(heart$oldpeak)
+```
+
+```{r}
+table(heart$slope)
+```
+
+```{r}
+table(heart$caa)
+```
+
+```{r}
+table(heart$thalassemia)
+```
+
+```{r}
+table(heart$target)
+```
+
+## CONDUCTNG DESCRIPTIVE ANALYSIS:
+
+Descriptive analysis on few columns of our dataset.
+
+```{r}
+summary(heart$age)
+```
+
+```{r}
+summary(heart$trtbps)
+```
+
+```{r}
+summary(heart$chol)
+```
+
+```{r}
+summary(heart$thalachh)
+```
+
+```{r}
+summary(heart$oldpeak)
+```
+
+Comparing different columns with each other from each of our dataset.
+
+```{r}
+aggregate(heart$trtbps ~ heart$age, data = heart, FUN = mean)
+aggregate(heart$trtbps ~ heart$age, data = heart, FUN = median)
+aggregate(heart$trtbps ~ heart$age, data = heart, FUN = max)
+aggregate(heart$trtbps ~ heart$age, data = heart, FUN = min)
+```
+
+```{r}
+aggregate(heart$chol ~ heart$age, data = heart, FUN = mean)
+aggregate(heart$chol ~ heart$age, data = heart, FUN = median)
+aggregate(heart$chol ~ heart$age, data = heart, FUN = max)
+aggregate(heart$chol ~ heart$age, data = heart, FUN = min)
+```
+
+```{r}
+aggregate(heart$thalachh ~ heart$age, data = heart, FUN = mean)
+aggregate(heart$thalachh ~ heart$age, data = heart, FUN = median)
+aggregate(heart$thalachh ~ heart$age, data = heart, FUN = max)
+aggregate(heart$thalachh ~ heart$age, data = heart, FUN = min)
+```
+
+```{r}
+aggregate(heart$oldpeak ~ heart$age, data = heart, FUN = mean)
+aggregate(heart$oldpeak ~ heart$age, data = heart, FUN = median)
+aggregate(heart$oldpeak ~ heart$age, data = heart, FUN = max)
+aggregate(heart$oldpeak ~ heart$age, data = heart, FUN = min)
+```
+
+```{r}
+aggregate(heart$age ~ heart$sex, data = heart, FUN = mean)
+aggregate(heart$age ~ heart$sex, data = heart, FUN = median)
+aggregate(heart$age ~ heart$sex, data = heart, FUN = max)
+aggregate(heart$age ~ heart$sex, data = heart, FUN = min)
+```
+
+```{r}
+aggregate(heart$trtbps ~ heart$sex, data = heart, FUN = mean)
+aggregate(heart$trtbps ~ heart$sex, data = heart, FUN = median)
+aggregate(heart$trtbps ~ heart$sex, data = heart, FUN = max)
+aggregate(heart$trtbps ~ heart$sex, data = heart, FUN = min)
+```
+
+```{r}
+aggregate(heart$thalachh ~ heart$sex, data = heart, FUN = mean)
+aggregate(heart$thalachh ~ heart$sex, data = heart, FUN = median)
+aggregate(heart$thalachh ~ heart$sex, data = heart, FUN = max)
+aggregate(heart$thalachh ~ heart$sex, data = heart, FUN = min)
+```
+
+```{r}
+aggregate(heart$oldpeak ~ heart$sex, data = heart, FUN = mean)
+aggregate(heart$oldpeak ~ heart$sex, data = heart, FUN = median)
+aggregate(heart$oldpeak ~ heart$sex, data = heart, FUN = max)
+aggregate(heart$oldpeak ~ heart$sex, data = heart, FUN = min)
+```
+
+## Comparing different columns of our dataframe with Age and Sex of people.
+
+```{r}
+aggregate(heart$chest_pain ~ heart$sex + heart$age, FUN = mean)
+aggregate(heart$trtbps ~ heart$sex + heart$age, FUN = mean)
+aggregate(heart$chol ~ heart$sex + heart$age, FUN = mean)
+aggregate(heart$fasting_blood_sugar ~ heart$sex + heart$age, FUN = mean)
+aggregate(heart$restecg ~ heart$sex + heart$age, FUN = mean)
+aggregate(heart$thalachh ~ heart$sex + heart$age, FUN = mean)
+aggregate(heart$exercise_induced_angina ~ heart$sex + heart$age, FUN = mean)
+aggregate(heart$oldpeak ~ heart$sex + heart$age, FUN = mean)
+aggregate(heart$slope ~ heart$sex + heart$age, FUN = mean)
+aggregate(heart$caa ~ heart$sex + heart$age, FUN = mean)
+aggregate(heart$thalassemia ~ heart$sex + heart$age, FUN = mean)
+aggregate(heart$target ~ heart$sex + heart$age, FUN = mean)
+```
+
+## Changing the values of few columns which will help us in better under standing of the visualization.
+
+```{r}
+heart$sex <- ifelse(heart$sex == 0, "female", "male")
+```
+
+```{r}
+heart$chest_pain <- ifelse(heart$chest_pain == 0, "typical angina",
+                           ifelse(heart$chest_pain == 1, "atypical angina",
+                                  ifelse(heart$chest_pain == 2, "non-anginal pain", 
+                                         ifelse(heart$chest_pain == 3, "asymptomatic", NA))))
+```
+
+```{r}
+heart$fasting_blood_sugar <- ifelse(heart$fasting_blood_sugar == 1, "true", "false")
+```
+
+```{r}
+heart$restecg <- ifelse(heart$restecg == 0, "normal",
+                        ifelse(heart$restecg == 1, "ST-T wave abnormality",
+                               ifelse(heart$restecg == 2, "showing probable", NA)))
+```
+
+```{r}
+heart$exercise_induced_angina <- ifelse(heart$exercise_induced_angina == 1, "yes", "no")
+```
+
+```{r}
+heart$slope <- ifelse(heart$slope == 0, "unsloping",
+                        ifelse(heart$slope == 1, "flat",
+                               ifelse(heart$slope == 2, "downsloping", NA)))
+```
+
+```{r}
+heart$thalassemia <- ifelse(heart$thalassemia == 0, "null",
+                        ifelse(heart$thalassemia == 1, "fixed defect",
+                               ifelse(heart$thalassemia == 2, "normal",
+                                      ifelse(heart$thalassemia == 3, "reversable defect", NA))))
+```
+
+```{r}
+heart$target <- ifelse(heart$target == 0, "less chance", "more chance")
+```
+
+## Data Visualization:
+
+Let's see the count of total male and female in our dataset.
+
+```{r}
+ggplot(heart, aes(x = sex, fill = sex)) +
+  geom_bar() +
+  labs(title = "Count Of SEXs", x = "Genders", y = "Count") +
+  theme_minimal()
+```
+
+Let's see the count of different types of chest pain in our dataset.
+
+```{r}
+ggplot(heart, aes(x = chest_pain, fill = chest_pain)) +
+  geom_bar() +
+  labs(title = "Count Of different types of chest_pains", x = "Chest_pain", y = "Count") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+Let's see the percentage distribution of fasting blood sugars.
+
+```{r}
+data <- as.data.frame(table(heart$fasting_blood_sugar))
+pie_chart <- ggplot(data, aes(x = "", y = Freq, fill = Var1)) +
+  geom_bar(stat = "identity") +
+  coord_polar(theta = "y") +
+  geom_text(aes(label = paste0(round((Freq/sum(Freq))*100), "%")),
+            position = position_stack(vjust = 0.5)) +
+  labs(title = "Fasting Blood Sugar Distribution",
+       fill = "Fasting Blood Sugar") +
+  theme_void()
+print(pie_chart)
+```
+
+Let's see the count of resting electrocardiographic results in our dataset.
+
+```{r}
+ggplot(heart, aes(x = restecg, fill = restecg)) +
+  geom_bar() +
+  labs(title = "Count of Resting Electrocardiographic Results", x = "Resting Electrocardiographic Results", y = "Count") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+Let's see the percentage distribution of exercise induced angina in our dataset.
+
+```{r}
+data <- as.data.frame(table(heart$exercise_induced_angina))
+pie_chart <- ggplot(data, aes(x = "", y = Freq, fill = Var1)) +
+  geom_bar(stat = "identity") +
+  coord_polar(theta = "y") +
+  geom_text(aes(label = paste0(round((Freq/sum(Freq))*100), "%")),
+            position = position_stack(vjust = 0.5)) +
+  labs(title = "Exercise Induced Angina Distribution",
+       fill = "Exercise Induced Angina") +
+  theme_void()
+print(pie_chart)
+```
+
+Let's see the count of slopes in our dataset.
+
+```{r}
+ggplot(heart, aes(x = slope, fill = slope)) +
+  geom_bar() +
+  labs(title = "Count of Slope", x = "Slope", y = "Count") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+Let's see the distribution in pie chart of caa.
+
+```{r}
+data <- as.data.frame(table(heart$caa))
+pie_chart <- ggplot(data, aes(x = "", y = Freq, fill = Var1)) +
+  geom_bar(stat = "identity") +
+  coord_polar(theta = "y") +
+  labs(title = "caa",
+       fill = "caa") +
+  theme_void()
+print(pie_chart)
+```
+
+Let's see the count of different thalassemia in our dataset.
+
+```{r}
+ggplot(heart, aes(x = thalassemia, fill = thalassemia)) +
+  geom_bar() +
+  labs(title = "Count of Thalassemia", x = "Thalassemia", y = "Count") +
+  theme_minimal() +
+  theme(legend.position = "top")
+```
+
+Let's see the percentage distribution of people having chances of heart attack.
+
+```{r}
+data <- as.data.frame(table(heart$target))
+pie_chart <- ggplot(data, aes(x = "", y = Freq, fill = Var1)) +
+  geom_bar(stat = "identity") +
+  coord_polar(theta = "y") +
+  geom_text(aes(label = paste0(round((Freq/sum(Freq))*100), "%")),
+            position = position_stack(vjust = 0.5)) +
+  labs(title = "target",
+       fill = "target") +
+  theme_void()
+print(pie_chart)
+```
+
+Let's see the count of chest pains in different genders.
+
+```{r}
+sex_count <- heart %>%
+  group_by(sex, chest_pain) %>%
+  summarise(sex_count = n(), .groups = "drop")
+ggplot(sex_count, aes(x = sex, y = sex_count, fill = chest_pain)) +
+  geom_col(position = "dodge") +
+  labs(title = "Count of SEXs by different Chest Pains",
+       x = "Sex",
+       y = "Count") +
+  theme_minimal()
+```
+
+Let's see the count of fasting blood sugar in different genders.
+
+```{r}
+count_fbs <- heart %>%
+  group_by(sex, fasting_blood_sugar) %>%
+  summarise(count_fbs = n(), .groups = "drop")
+ggplot(count_fbs, aes(x = sex, y = count_fbs, fill = fasting_blood_sugar)) +
+  geom_col(position = "dodge") +
+  labs(title = "Count of SEXs by Fasting Blood Sugar",
+       x = "Sex",
+       y = "Count") +
+  theme_minimal() +
+  theme(legend.position = "top")
+```
+
+Let's see the count of resting ecg results in different genders.
+
+```{r}
+count_restecg <- heart %>%
+  group_by(sex, restecg) %>%
+  summarise(count_restecg = n(), .groups = "drop")
+ggplot(count_restecg, aes(x = sex, y = count_restecg, fill = restecg)) +
+  geom_col(position = "dodge") +
+  labs(title = "Count of SEXs by Resting Electrocardiographic Results",
+       x = "Sex",
+       y = "Count") +
+  theme_minimal() +
+  theme(legend.position = "top")
+```
+
+Let's see the count of exercise induced angina in different genders.
+
+```{r}
+count_eia <- heart %>%
+  group_by(sex, exercise_induced_angina) %>%
+  summarise(count_eia = n(), .groups = "drop")
+ggplot(count_eia, aes(x = sex, y = count_eia, fill = exercise_induced_angina)) +
+  geom_col(position = "dodge") +
+  labs(title = "Count of SEXs by Exercise Induced Angina",
+       x = "Sex",
+       y = "Count") +
+  theme_minimal() +
+  theme(legend.position = "top")
+```
+
+Let's see the count of slopes in different genders.
+
+```{r}
+count_slope <- heart %>%
+  group_by(sex, slope) %>%
+  summarise(count_slope = n(), .groups = "drop")
+ggplot(count_slope, aes(x = sex, y = count_slope, fill = slope)) +
+  geom_col(position = "dodge") +
+  labs(title = "Count of SEXs by Slope",
+       x = "Sex",
+       y = "Count") +
+  theme_minimal() +
+  theme(legend.position = "top")
+```
+
+Let's see the count of different thalassemias in different genders.
+
+```{r}
+count_thala <- heart %>%
+  group_by(sex, thalassemia) %>%
+  summarise(count_thala = n(), .groups = "drop")
+ggplot(count_thala, aes(x = sex, y = count_thala, fill = thalassemia)) +
+  geom_col(position = "dodge") +
+  labs(title = "Count of SEXs by Thalassemia",
+       x = "Sex",
+       y = "Count") +
+  theme_minimal() +
+  theme(legend.position = "top")
+```
+
+Finally, let's see the chance of getting heart attack in different genders.
+
+```{r}
+count_target <- heart %>%
+  group_by(sex, target) %>%
+  summarise(count_target = n(), .groups = "drop")
+ggplot(count_target, aes(x = sex, y = count_target, fill = target)) +
+  geom_col(position = "dodge") +
+  labs(title = "Count of SEXs by Target",
+       x = "Sex",
+       y = "Count") +
+  theme_minimal() +
+  theme(legend.position = "top")
+```
+
